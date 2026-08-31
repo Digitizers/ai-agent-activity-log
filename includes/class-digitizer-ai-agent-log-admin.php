@@ -9,12 +9,12 @@
 
 if ( ! defined( 'ABSPATH' ) ) { exit; }
 
-class AI_Agent_Activity_Log_Admin {
+class Digitizer_AI_Agent_Log_Admin {
 
-	const PAGE_SLUG = 'ai-agent-activity-log';
+	const PAGE_SLUG = 'digitizer-ai-agent-log';
 
 	public function __construct() {
-		add_action( 'admin_post_ai_agent_activity_log_clear', array( $this, 'handle_clear' ) );
+		add_action( 'admin_post_digitizer_ai_agent_log_clear', array( $this, 'handle_clear' ) );
 	}
 
 	/**
@@ -27,8 +27,8 @@ class AI_Agent_Activity_Log_Admin {
 	 */
 	public function register_menu() {
 		add_menu_page(
-			__( 'AI Agent Activity Log', 'ai-agent-activity-log' ),
-			__( 'Agent Activity', 'ai-agent-activity-log' ),
+			__( 'Digitizer AI Agent Log', 'digitizer-ai-agent-log' ),
+			__( 'Agent Activity', 'digitizer-ai-agent-log' ),
 			'manage_options',
 			self::PAGE_SLUG,
 			array( $this, 'render_page' ),
@@ -90,7 +90,7 @@ class AI_Agent_Activity_Log_Admin {
 
 	public function render_page() {
 		if ( ! current_user_can( 'manage_options' ) ) {
-			wp_die( esc_html__( 'You are not allowed to do that.', 'ai-agent-activity-log' ) );
+			wp_die( esc_html__( 'You are not allowed to do that.', 'digitizer-ai-agent-log' ) );
 		}
 
 		$args = array( 'per_page' => 100 );
@@ -140,7 +140,7 @@ class AI_Agent_Activity_Log_Admin {
 
 		// Values outside the enums contribute nothing to the query, so a
 		// hand-edited URL narrows the list or does nothing - never widens it.
-		$rows = AI_Agent_Activity_Log_Store::query( $args );
+		$rows = Digitizer_AI_Agent_Log_Store::query( $args );
 
 		// The 'When' column is rendered with wp_date(), not date_i18n().
 		// $stamp below is a true Unix timestamp - strtotime() on a UTC string -
@@ -157,43 +157,43 @@ class AI_Agent_Activity_Log_Admin {
 		$format = get_option( 'date_format' ) . ' ' . get_option( 'time_format' );
 		?>
 		<div class="wrap">
-			<h1><?php esc_html_e( 'Agent Log', 'ai-agent-activity-log' ); ?></h1>
-			<p><?php esc_html_e( 'Changes that arrived from somewhere other than a browser: the REST API, WP-Cron, WP-CLI or XML-RPC. Work done by a person in the admin is not recorded here.', 'ai-agent-activity-log' ); ?></p>
+			<h1><?php esc_html_e( 'Agent Log', 'digitizer-ai-agent-log' ); ?></h1>
+			<p><?php esc_html_e( 'Changes that arrived from somewhere other than a browser: the REST API, WP-Cron, WP-CLI or XML-RPC. Work done by a person in the admin is not recorded here.', 'digitizer-ai-agent-log' ); ?></p>
 
 			<form method="get">
 				<input type="hidden" name="page" value="<?php echo esc_attr( self::PAGE_SLUG ); ?>" />
 				<select name="channel">
-					<option value=""><?php esc_html_e( 'Every channel', 'ai-agent-activity-log' ); ?></option>
+					<option value=""><?php esc_html_e( 'Every channel', 'digitizer-ai-agent-log' ); ?></option>
 					<?php foreach ( array( 'rest', 'cron', 'cli', 'xmlrpc' ) as $channel ) : ?>
 						<option value="<?php echo esc_attr( $channel ); ?>" <?php selected( isset( $args['channel'] ) ? $args['channel'] : '', $channel ); ?>><?php echo esc_html( $channel ); ?></option>
 					<?php endforeach; ?>
 				</select>
 				<select name="object_type">
-					<option value=""><?php esc_html_e( 'Everything', 'ai-agent-activity-log' ); ?></option>
+					<option value=""><?php esc_html_e( 'Everything', 'digitizer-ai-agent-log' ); ?></option>
 					<?php foreach ( array( 'post', 'term', 'attachment', 'user', 'plugin', 'theme', 'option' ) as $type ) : ?>
 						<option value="<?php echo esc_attr( $type ); ?>" <?php selected( isset( $args['object_type'] ) ? $args['object_type'] : '', $type ); ?>><?php echo esc_html( $type ); ?></option>
 					<?php endforeach; ?>
 				</select>
-				<label for="aial-after" class="screen-reader-text"><?php esc_html_e( 'From date', 'ai-agent-activity-log' ); ?></label>
-				<input type="date" id="aial-after" name="after" value="<?php echo esc_attr( $after ); ?>" placeholder="<?php esc_attr_e( 'From date', 'ai-agent-activity-log' ); ?>" />
-				<label for="aial-before" class="screen-reader-text"><?php esc_html_e( 'To date', 'ai-agent-activity-log' ); ?></label>
-				<input type="date" id="aial-before" name="before" value="<?php echo esc_attr( $before ); ?>" placeholder="<?php esc_attr_e( 'To date', 'ai-agent-activity-log' ); ?>" />
-				<button type="submit" class="button"><?php esc_html_e( 'Filter', 'ai-agent-activity-log' ); ?></button>
+				<label for="aial-after" class="screen-reader-text"><?php esc_html_e( 'From date', 'digitizer-ai-agent-log' ); ?></label>
+				<input type="date" id="aial-after" name="after" value="<?php echo esc_attr( $after ); ?>" placeholder="<?php esc_attr_e( 'From date', 'digitizer-ai-agent-log' ); ?>" />
+				<label for="aial-before" class="screen-reader-text"><?php esc_html_e( 'To date', 'digitizer-ai-agent-log' ); ?></label>
+				<input type="date" id="aial-before" name="before" value="<?php echo esc_attr( $before ); ?>" placeholder="<?php esc_attr_e( 'To date', 'digitizer-ai-agent-log' ); ?>" />
+				<button type="submit" class="button"><?php esc_html_e( 'Filter', 'digitizer-ai-agent-log' ); ?></button>
 			</form>
 
 			<table class="wp-list-table widefat striped">
 				<thead>
 					<tr>
-						<th><?php esc_html_e( 'When', 'ai-agent-activity-log' ); ?></th>
-						<th><?php esc_html_e( 'Channel', 'ai-agent-activity-log' ); ?></th>
-						<th><?php esc_html_e( 'Application', 'ai-agent-activity-log' ); ?></th>
-						<th><?php esc_html_e( 'What', 'ai-agent-activity-log' ); ?></th>
-						<th><?php esc_html_e( 'Fields', 'ai-agent-activity-log' ); ?></th>
+						<th><?php esc_html_e( 'When', 'digitizer-ai-agent-log' ); ?></th>
+						<th><?php esc_html_e( 'Channel', 'digitizer-ai-agent-log' ); ?></th>
+						<th><?php esc_html_e( 'Application', 'digitizer-ai-agent-log' ); ?></th>
+						<th><?php esc_html_e( 'What', 'digitizer-ai-agent-log' ); ?></th>
+						<th><?php esc_html_e( 'Fields', 'digitizer-ai-agent-log' ); ?></th>
 					</tr>
 				</thead>
 				<tbody>
 				<?php if ( empty( $rows ) ) : ?>
-					<tr><td colspan="5"><?php esc_html_e( 'Nothing recorded yet. Either no automation has changed anything here, or the module was switched on after it did.', 'ai-agent-activity-log' ); ?></td></tr>
+					<tr><td colspan="5"><?php esc_html_e( 'Nothing recorded yet. Either no automation has changed anything here, or the module was switched on after it did.', 'digitizer-ai-agent-log' ); ?></td></tr>
 				<?php else : ?>
 					<?php foreach ( $rows as $row ) : ?>
 						<?php
@@ -208,7 +208,7 @@ class AI_Agent_Activity_Log_Admin {
 								<?php
 								printf(
 									/* translators: 1: action, 2: object type, 3: object name or id */
-									esc_html__( '%1$s %2$s %3$s', 'ai-agent-activity-log' ),
+									esc_html__( '%1$s %2$s %3$s', 'digitizer-ai-agent-log' ),
 									esc_html( isset( $row->action ) ? $row->action : '' ),
 									esc_html( isset( $row->object_subtype ) && '' !== $row->object_subtype ? $row->object_subtype : ( isset( $row->object_type ) ? $row->object_type : '' ) ),
 									esc_html( isset( $row->object_name ) && '' !== $row->object_name ? $row->object_name : '#' . ( isset( $row->object_id ) ? (int) $row->object_id : 0 ) )
@@ -223,17 +223,17 @@ class AI_Agent_Activity_Log_Admin {
 			</table>
 
 			<form method="post" action="<?php echo esc_url( admin_url( 'admin-post.php' ) ); ?>">
-				<?php wp_nonce_field( 'ai_agent_activity_log_clear' ); ?>
-				<input type="hidden" name="action" value="ai_agent_activity_log_clear" />
-				<p><button type="submit" class="button"><?php esc_html_e( 'Clear the log', 'ai-agent-activity-log' ); ?></button></p>
+				<?php wp_nonce_field( 'digitizer_ai_agent_log_clear' ); ?>
+				<input type="hidden" name="action" value="digitizer_ai_agent_log_clear" />
+				<p><button type="submit" class="button"><?php esc_html_e( 'Clear the log', 'digitizer-ai-agent-log' ); ?></button></p>
 			</form>
 
 			<p class="description">
 				<?php
 				printf(
 					/* translators: 1: the REST route, 2: link to the plugin author's site */
-					esc_html__( 'The same entries are readable over the REST API at %1$s. Built by %2$s.', 'ai-agent-activity-log' ),
-					'<code>' . esc_html( AI_Agent_Activity_Log_Rest::NAMESPACE_V1 ) . '/activity</code>',
+					esc_html__( 'The same entries are readable over the REST API at %1$s. Built by %2$s.', 'digitizer-ai-agent-log' ),
+					'<code>' . esc_html( Digitizer_AI_Agent_Log_Rest::NAMESPACE_V1 ) . '/activity</code>',
 					'<a href="https://digitizer.co.il" target="_blank" rel="noopener noreferrer">Digitizer</a>'
 				);
 				?>
@@ -244,11 +244,11 @@ class AI_Agent_Activity_Log_Admin {
 
 	public function handle_clear() {
 		if ( ! current_user_can( 'manage_options' ) ) {
-			wp_die( esc_html__( 'You are not allowed to do that.', 'ai-agent-activity-log' ) );
+			wp_die( esc_html__( 'You are not allowed to do that.', 'digitizer-ai-agent-log' ) );
 		}
-		check_admin_referer( 'ai_agent_activity_log_clear' );
+		check_admin_referer( 'digitizer_ai_agent_log_clear' );
 
-		AI_Agent_Activity_Log_Store::clear();
+		Digitizer_AI_Agent_Log_Store::clear();
 
 		wp_safe_redirect( admin_url( 'admin.php?page=' . self::PAGE_SLUG ) );
 		exit;

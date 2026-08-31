@@ -10,7 +10,7 @@
 
 if ( ! defined( 'ABSPATH' ) ) { exit; }
 
-class AI_Agent_Activity_Log_Channel {
+class Digitizer_AI_Agent_Log_Channel {
 
 	/**
 	 * The channel this request arrived on, or '' for anything else.
@@ -137,7 +137,7 @@ class AI_Agent_Activity_Log_Channel {
 	 * default-filters.php hooks to 'parse_request' - long after
 	 * plugins_loaded. At plugins_loaded a REST request cannot be told from a
 	 * browser one, which is the whole reason the channel gate itself lives in
-	 * AI_Agent_Activity_Log_Hooks::flush(), on 'shutdown'.
+	 * Digitizer_AI_Agent_Log_Hooks::flush(), on 'shutdown'.
 	 *
 	 * @return bool
 	 */

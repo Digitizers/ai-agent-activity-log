@@ -9,7 +9,7 @@
 
 if ( ! defined( 'ABSPATH' ) ) { exit; }
 
-class AI_Agent_Activity_Log_Hooks {
+class Digitizer_AI_Agent_Log_Hooks {
 
 	/**
 	 * Columns whose change says nothing. post_modified moves on every save by
@@ -29,7 +29,7 @@ class AI_Agent_Activity_Log_Hooks {
 		// which is a GET; WP-CLI has no HTTP verb at all. Skipping either for
 		// looking like a read would leave a whole advertised channel with no
 		// listener and no shutdown flush, so every change it made would go
-		// unrecorded. See AI_Agent_Activity_Log_Channel::is_early_channel().
+		// unrecorded. See Digitizer_AI_Agent_Log_Channel::is_early_channel().
 		//
 		// The channel is deliberately NOT checked here. init() is reached from
 		// the plugin's own boot on 'plugins_loaded', but core defines REST_REQUEST
@@ -39,7 +39,7 @@ class AI_Agent_Activity_Log_Hooks {
 		// register nothing, which is the module's main channel recording
 		// nothing at all. The gate lives in flush() instead, on 'shutdown', by
 		// which time the constant exists.
-		if ( ! AI_Agent_Activity_Log_Channel::is_early_channel() && AI_Agent_Activity_Log_Channel::is_read_request() ) {
+		if ( ! Digitizer_AI_Agent_Log_Channel::is_early_channel() && Digitizer_AI_Agent_Log_Channel::is_read_request() ) {
 			return;
 		}
 
@@ -97,7 +97,7 @@ class AI_Agent_Activity_Log_Hooks {
 		 *
 		 * @param array $options Option names.
 		 */
-		$filtered = apply_filters( 'ai_agent_activity_log_watched_options', $default );
+		$filtered = apply_filters( 'digitizer_ai_agent_log_watched_options', $default );
 		// A filter that returns something other than a list would otherwise
 		// turn the allowlist into "watch everything", which is the one
 		// outcome it exists to prevent.
@@ -160,7 +160,7 @@ class AI_Agent_Activity_Log_Hooks {
 			return;
 		}
 		$type = ( isset( $post->post_type ) && 'attachment' === $post->post_type ) ? 'attachment' : 'post';
-		AI_Agent_Activity_Log_Buffer::record(
+		Digitizer_AI_Agent_Log_Buffer::record(
 			$type,
 			isset( $post->post_type ) ? $post->post_type : '',
 			$post_id,
@@ -183,7 +183,7 @@ class AI_Agent_Activity_Log_Hooks {
 			return;
 		}
 		$type = ( is_object( $post ) && isset( $post->post_type ) && 'attachment' === $post->post_type ) ? 'attachment' : 'post';
-		AI_Agent_Activity_Log_Buffer::record(
+		Digitizer_AI_Agent_Log_Buffer::record(
 			$type,
 			is_object( $post ) && isset( $post->post_type ) ? $post->post_type : '',
 			$post_id,
@@ -208,7 +208,7 @@ class AI_Agent_Activity_Log_Hooks {
 			return;
 		}
 		$type = ( 'attachment' === $post->post_type ) ? 'attachment' : 'post';
-		AI_Agent_Activity_Log_Buffer::record( $type, $post->post_type, $object_id, 'updated', $post->post_title, array( $meta_key ) );
+		Digitizer_AI_Agent_Log_Buffer::record( $type, $post->post_type, $object_id, 'updated', $post->post_title, array( $meta_key ) );
 	}
 
 	public static function on_term_created( $term_id, $tt_id, $taxonomy ) {
@@ -220,7 +220,7 @@ class AI_Agent_Activity_Log_Hooks {
 	}
 
 	public static function on_term_deleted( $term_id, $tt_id, $taxonomy, $deleted_term ) {
-		AI_Agent_Activity_Log_Buffer::record(
+		Digitizer_AI_Agent_Log_Buffer::record(
 			'term',
 			(string) $taxonomy,
 			$term_id,
@@ -231,7 +231,7 @@ class AI_Agent_Activity_Log_Hooks {
 
 	private static function record_term( $term_id, $taxonomy, $action ) {
 		$term = get_term( $term_id, $taxonomy );
-		AI_Agent_Activity_Log_Buffer::record(
+		Digitizer_AI_Agent_Log_Buffer::record(
 			'term',
 			(string) $taxonomy,
 			$term_id,
@@ -249,15 +249,15 @@ class AI_Agent_Activity_Log_Hooks {
 	}
 
 	public static function on_user_role( $user_id, $role ) {
-		AI_Agent_Activity_Log_Buffer::record( 'user', (string) $role, $user_id, 'updated', self::user_login( $user_id ), array( 'role' ) );
+		Digitizer_AI_Agent_Log_Buffer::record( 'user', (string) $role, $user_id, 'updated', self::user_login( $user_id ), array( 'role' ) );
 	}
 
 	public static function on_user_deleted( $user_id ) {
-		AI_Agent_Activity_Log_Buffer::record( 'user', '', $user_id, 'deleted' );
+		Digitizer_AI_Agent_Log_Buffer::record( 'user', '', $user_id, 'deleted' );
 	}
 
 	private static function record_user( $user_id, $action ) {
-		AI_Agent_Activity_Log_Buffer::record( 'user', '', $user_id, $action, self::user_login( $user_id ) );
+		Digitizer_AI_Agent_Log_Buffer::record( 'user', '', $user_id, $action, self::user_login( $user_id ) );
 	}
 
 	private static function user_login( $user_id ) {
@@ -266,22 +266,22 @@ class AI_Agent_Activity_Log_Hooks {
 	}
 
 	public static function on_plugin_activated( $plugin ) {
-		AI_Agent_Activity_Log_Buffer::record( 'plugin', (string) $plugin, 0, 'activated', (string) $plugin );
+		Digitizer_AI_Agent_Log_Buffer::record( 'plugin', (string) $plugin, 0, 'activated', (string) $plugin );
 	}
 
 	public static function on_plugin_deactivated( $plugin ) {
-		AI_Agent_Activity_Log_Buffer::record( 'plugin', (string) $plugin, 0, 'deactivated', (string) $plugin );
+		Digitizer_AI_Agent_Log_Buffer::record( 'plugin', (string) $plugin, 0, 'deactivated', (string) $plugin );
 	}
 
 	public static function on_theme_switched( $new_name, $new_theme = null ) {
-		AI_Agent_Activity_Log_Buffer::record( 'theme', '', 0, 'switched', (string) $new_name );
+		Digitizer_AI_Agent_Log_Buffer::record( 'theme', '', 0, 'switched', (string) $new_name );
 	}
 
 	public static function on_option_updated( $option ) {
 		if ( ! in_array( $option, self::watched_options(), true ) ) {
 			return;
 		}
-		AI_Agent_Activity_Log_Buffer::record( 'option', '', 0, 'updated', (string) $option, array( (string) $option ) );
+		Digitizer_AI_Agent_Log_Buffer::record( 'option', '', 0, 'updated', (string) $option, array( (string) $option ) );
 	}
 
 	/**
@@ -300,25 +300,25 @@ class AI_Agent_Activity_Log_Hooks {
 		// runs on 'shutdown', the first point at which REST_REQUEST is defined
 		// for a REST request. A browser request that reached a listener leaves
 		// nothing behind for a later request in the same process.
-		$channel = AI_Agent_Activity_Log_Channel::current();
+		$channel = Digitizer_AI_Agent_Log_Channel::current();
 		if ( '' === $channel ) {
-			AI_Agent_Activity_Log_Buffer::reset();
+			Digitizer_AI_Agent_Log_Buffer::reset();
 			return;
 		}
 
-		if ( ! AI_Agent_Activity_Log_Buffer::pending() ) {
+		if ( ! Digitizer_AI_Agent_Log_Buffer::pending() ) {
 			// Nothing changed. app_name() reads user meta, so it is not paid
 			// for until there is a row that needs it.
 			return;
 		}
 
-		$rows = AI_Agent_Activity_Log_Buffer::rows(
+		$rows = Digitizer_AI_Agent_Log_Buffer::rows(
 			$channel,
-			AI_Agent_Activity_Log_Channel::app_name(),
+			Digitizer_AI_Agent_Log_Channel::app_name(),
 			get_current_user_id(),
 			time()
 		);
-		AI_Agent_Activity_Log_Buffer::reset();
+		Digitizer_AI_Agent_Log_Buffer::reset();
 
 		if ( empty( $rows ) ) {
 			return;
@@ -329,7 +329,7 @@ class AI_Agent_Activity_Log_Hooks {
 		// an ordinary thing to write, and by the time 'shutdown' runs it has
 		// long since restored the site it started on. The table is per site
 		// - $wpdb->prefix follows the switch (wp-includes/ms-blogs.php:534,
-		// via wpdb::set_blog_id()), and so does AI_Agent_Activity_Log_Store::table() - so
+		// via wpdb::set_blog_id()), and so does Digitizer_AI_Agent_Log_Store::table() - so
 		// writing every row here would file all of them under whichever site
 		// happens to be current now. Group by the site each change was
 		// recorded on and write each group in that site's context.
@@ -359,7 +359,7 @@ class AI_Agent_Activity_Log_Hooks {
 				// run to create. So each group asks the site it is about.
 				if ( self::blog_records() ) {
 					foreach ( $blog_rows as $row ) {
-						AI_Agent_Activity_Log_Store::insert( $row );
+						Digitizer_AI_Agent_Log_Store::insert( $row );
 					}
 					self::maybe_prune();
 				}
@@ -399,7 +399,7 @@ class AI_Agent_Activity_Log_Hooks {
 	 * @return bool
 	 */
 	private static function blog_records() {
-		return get_option( 'ai_agent_activity_log_schema', '' ) === AI_Agent_Activity_Log_Store::SCHEMA_VERSION;
+		return get_option( 'digitizer_ai_agent_log_schema', '' ) === Digitizer_AI_Agent_Log_Store::SCHEMA_VERSION;
 	}
 
 	/**
@@ -416,11 +416,11 @@ class AI_Agent_Activity_Log_Hooks {
 	 * @return void
 	 */
 	private static function maybe_prune() {
-		$last = (int) get_option( 'ai_agent_activity_log_last_prune', 0 );
+		$last = (int) get_option( 'digitizer_ai_agent_log_last_prune', 0 );
 		if ( ( time() - $last ) < HOUR_IN_SECONDS ) {
 			return;
 		}
-		update_option( 'ai_agent_activity_log_last_prune', time(), false );
-		AI_Agent_Activity_Log_Store::prune( AI_Agent_Activity_Log_Buffer::max_age_days(), AI_Agent_Activity_Log_Buffer::max_rows(), time() );
+		update_option( 'digitizer_ai_agent_log_last_prune', time(), false );
+		Digitizer_AI_Agent_Log_Store::prune( Digitizer_AI_Agent_Log_Buffer::max_age_days(), Digitizer_AI_Agent_Log_Buffer::max_rows(), time() );
 	}
 }

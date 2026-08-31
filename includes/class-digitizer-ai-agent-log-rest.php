@@ -9,9 +9,9 @@
 
 if ( ! defined( 'ABSPATH' ) ) { exit; }
 
-class AI_Agent_Activity_Log_Rest {
+class Digitizer_AI_Agent_Log_Rest {
 
-	const NAMESPACE_V1 = 'ai-agent-activity-log/v1';
+	const NAMESPACE_V1 = 'digitizer-ai-agent-log/v1';
 
 	/**
 	 * The API is the product: the screen exists so a person can answer the
@@ -93,9 +93,9 @@ class AI_Agent_Activity_Log_Rest {
 			}
 		}
 
-		$rows  = AI_Agent_Activity_Log_Store::query( $args );
-		$total = AI_Agent_Activity_Log_Store::count( $args );
-		$parts = AI_Agent_Activity_Log_Store::query_args( $args );
+		$rows  = Digitizer_AI_Agent_Log_Store::query( $args );
+		$total = Digitizer_AI_Agent_Log_Store::count( $args );
+		$parts = Digitizer_AI_Agent_Log_Store::query_args( $args );
 
 		$items = array();
 		foreach ( $rows as $row ) {

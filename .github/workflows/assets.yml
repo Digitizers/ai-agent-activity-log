@@ -22,6 +22,6 @@ jobs:
         env:
           SVN_USERNAME: ${{ secrets.SVN_USERNAME }}
           SVN_PASSWORD: ${{ secrets.SVN_PASSWORD }}
-          SLUG: ai-agent-activity-log
+          SLUG: digitizer-ai-agent-log
           ASSETS_DIR: .wordpress-org
           IGNORE_OTHER_FILES: true
