@@ -11,7 +11,7 @@
 
 if ( ! defined( 'ABSPATH' ) ) { exit; }
 
-class AI_Agent_Activity_Log_Store {
+class Digitizer_AI_Agent_Log_Store {
 
 	const DEFAULT_PER_PAGE = 20;
 	const MAX_PER_PAGE     = 100;
@@ -68,7 +68,7 @@ class AI_Agent_Activity_Log_Store {
 	 * @return string
 	 */
 	public static function table() {
-		return self::writer()->prefix . 'ai_agent_activity_log';
+		return self::writer()->prefix . 'digitizer_ai_agent_log';
 	}
 
 	/**
@@ -376,7 +376,7 @@ class AI_Agent_Activity_Log_Store {
 	 * @return void
 	 */
 	public static function install_table() {
-		if ( get_option( 'ai_agent_activity_log_schema', '' ) === self::SCHEMA_VERSION ) {
+		if ( get_option( 'digitizer_ai_agent_log_schema', '' ) === self::SCHEMA_VERSION ) {
 			return;
 		}
 
@@ -422,7 +422,7 @@ class AI_Agent_Activity_Log_Store {
 		//
 		// LIKE reads _ as a single-character wildcard and every prefix has
 		// one, so the name is escaped with esc_like() before prepare() quotes
-		// it - otherwise wp_ai_agent_activity_log would match wpXaiXagentXactivityXlog and the
+		// it - otherwise wp_digitizer_ai_agent_log would match wpXdigitizerXaiXagentXlog and the
 		// check would pass on a table this module never created.
 		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- checking for the table this module just created; there is no cache for that.
 		$found = $writer->get_var( $writer->prepare( 'SHOW TABLES LIKE %s', $writer->esc_like( $table ) ) );
@@ -430,7 +430,7 @@ class AI_Agent_Activity_Log_Store {
 			return;
 		}
 
-		update_option( 'ai_agent_activity_log_schema', self::SCHEMA_VERSION );
+		update_option( 'digitizer_ai_agent_log_schema', self::SCHEMA_VERSION );
 	}
 
 	/**

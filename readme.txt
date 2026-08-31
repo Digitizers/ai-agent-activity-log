@@ -1,4 +1,4 @@
-=== AI Agent Activity Log ===
+=== Digitizer AI Agent Log ===
 Contributors: benkalsky
 Tags: activity log, audit log, ai, rest api, wp-cli
 Requires at least: 5.5
@@ -36,7 +36,7 @@ General activity logs record everything, which means the automated change you ar
 
 = Reading the log =
 
-On its own admin screen, filtered by channel, object type and date range. Or over the REST API at `ai-agent-activity-log/v1/activity`, which requires `manage_options`. There is deliberately no route that deletes: a log that can be erased through the API is a log an attacker erases on the way out.
+On its own admin screen, filtered by channel, object type and date range. Or over the REST API at `digitizer-ai-agent-log/v1/activity`, which requires `manage_options`. There is deliberately no route that deletes: a log that can be erased through the API is a log an attacker erases on the way out.
 
 = Multisite =
 

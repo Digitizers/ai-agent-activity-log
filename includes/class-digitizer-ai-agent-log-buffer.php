@@ -10,7 +10,7 @@
 
 if ( ! defined( 'ABSPATH' ) ) { exit; }
 
-class AI_Agent_Activity_Log_Buffer {
+class Digitizer_AI_Agent_Log_Buffer {
 
 	const DEFAULT_MAX_AGE_DAYS = 30;
 	const DEFAULT_MAX_ROWS     = 20000;
@@ -127,9 +127,9 @@ class AI_Agent_Activity_Log_Buffer {
 	 *
 	 * Each row carries the 'blog_id' its entry was recorded on. That is
 	 * routing information, not a column: the table is per site, so the row
-	 * needs no site column and AI_Agent_Activity_Log_Store::insert() - which builds its data
+	 * needs no site column and Digitizer_AI_Agent_Log_Store::insert() - which builds its data
 	 * from columns() and ignores anything else in the row - never writes it.
-	 * AI_Agent_Activity_Log_Hooks::flush() groups on it to reach the right table.
+	 * Digitizer_AI_Agent_Log_Hooks::flush() groups on it to reach the right table.
 	 *
 	 * @param string $channel Channel name.
 	 * @param string $app     Application name, '' when unknown.
@@ -159,7 +159,7 @@ class AI_Agent_Activity_Log_Buffer {
 		 *
 		 * @param int $days Days, 0 or less to disable the age bound.
 		 */
-		return (int) apply_filters( 'ai_agent_activity_log_max_age_days', self::DEFAULT_MAX_AGE_DAYS );
+		return (int) apply_filters( 'digitizer_ai_agent_log_max_age_days', self::DEFAULT_MAX_AGE_DAYS );
 	}
 
 	/**
@@ -171,6 +171,6 @@ class AI_Agent_Activity_Log_Buffer {
 		 *
 		 * @param int $rows Rows, 0 or less to disable the row bound.
 		 */
-		return (int) apply_filters( 'ai_agent_activity_log_max_rows', self::DEFAULT_MAX_ROWS );
+		return (int) apply_filters( 'digitizer_ai_agent_log_max_rows', self::DEFAULT_MAX_ROWS );
 	}
 }

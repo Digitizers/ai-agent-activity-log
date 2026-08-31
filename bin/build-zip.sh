@@ -3,14 +3,14 @@
 # Build an installable plugin ZIP from the current working tree.
 #
 # WordPress requires the archive to contain exactly one folder named after the
-# plugin, so the tracked files are staged into ai-agent-activity-log/ first.
+# plugin, so the tracked files are staged into digitizer-ai-agent-log/ first.
 #
 # Usage:
-#   bin/build-zip.sh                 # -> dist/ai-agent-activity-log.zip
+#   bin/build-zip.sh                 # -> dist/digitizer-ai-agent-log.zip
 #
 set -euo pipefail
 
-SLUG="ai-agent-activity-log"
+SLUG="digitizer-ai-agent-log"
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 OUT_NAME="${1:-$SLUG.zip}"
 DIST="$ROOT/dist"

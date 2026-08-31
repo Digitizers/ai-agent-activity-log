@@ -7,7 +7,7 @@
  * undefined, so asserting on them inside agent-log-test.php would change the
  * channel every later assertion in that file sees. A separate process defines
  * exactly one of them - or neither, which is the control - and reports what
- * AI_Agent_Activity_Log_Hooks::init() did.
+ * Digitizer_AI_Agent_Log_Hooks::init() did.
  *
  * The HTTP verb is GET in every case on purpose: that is the verb an external
  * scheduler fetches wp-cron.php with, and it is the verb that used to make
@@ -15,7 +15,7 @@
  *
  * A second argument of 'cookie' additionally stages a REST request carrying a
  * valid logged-in cookie, which is how the parent proves that the browser-
- * session check AI_Agent_Activity_Log_Channel::current() applies to REST leaves these two
+ * session check Digitizer_AI_Agent_Log_Channel::current() applies to REST leaves these two
  * channels alone.
  *
  * Usage: php tests/early-channel-child.php cli|xmlrpc|none [cookie]
@@ -35,10 +35,10 @@ if ( 'xmlrpc' === $aial_case ) {
 }
 
 require_once __DIR__ . '/bootstrap.php';
-require_once dirname( __DIR__ ) . '/includes/class-ai-agent-activity-log-channel.php';
-require_once dirname( __DIR__ ) . '/includes/class-ai-agent-activity-log-store.php';
-require_once dirname( __DIR__ ) . '/includes/class-ai-agent-activity-log-buffer.php';
-require_once dirname( __DIR__ ) . '/includes/class-ai-agent-activity-log-hooks.php';
+require_once dirname( __DIR__ ) . '/includes/class-digitizer-ai-agent-log-channel.php';
+require_once dirname( __DIR__ ) . '/includes/class-digitizer-ai-agent-log-store.php';
+require_once dirname( __DIR__ ) . '/includes/class-digitizer-ai-agent-log-buffer.php';
+require_once dirname( __DIR__ ) . '/includes/class-digitizer-ai-agent-log-hooks.php';
 
 $_SERVER['REQUEST_METHOD']        = 'GET';
 $GLOBALS['aial_stub_doing_cron']   = false;
@@ -51,9 +51,9 @@ if ( $aial_cookie ) {
 	$GLOBALS['aial_stub_app_passwords']     = array();
 }
 
-$aial_early   = AI_Agent_Activity_Log_Channel::is_early_channel() ? 1 : 0;
-$aial_channel = AI_Agent_Activity_Log_Channel::current();
-AI_Agent_Activity_Log_Hooks::init();
+$aial_early   = Digitizer_AI_Agent_Log_Channel::is_early_channel() ? 1 : 0;
+$aial_channel = Digitizer_AI_Agent_Log_Channel::current();
+Digitizer_AI_Agent_Log_Hooks::init();
 
 printf(
 	"early=%d hooks=%d channel=%s\n",
