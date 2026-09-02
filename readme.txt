@@ -4,7 +4,7 @@ Tags: activity log, audit log, ai, rest api, wp-cli
 Requires at least: 5.5
 Tested up to: 7.1
 Requires PHP: 7.2
-Stable tag: 1.0.1
+Stable tag: 1.1.0
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -61,6 +61,21 @@ No. Nothing leaves the site.
 
 Old rows are pruned automatically, at most once an hour.
 
+= A plugin on my site rewrites its own settings and fills the log. Can I silence it? =
+
+Yes, with a filter. Nothing is filtered out by default, because what is absent from this log is supposed to mean it did not happen over an API:
+
+`add_filter( 'digitizer_ai_agent_log_record', function ( $record, $entry ) {
+    if ( 'elementor_library' === $entry['object_subtype'] ) {
+        return false;
+    }
+    return $record;
+}, 10, 2 );`
+
+The entry carries `object_type`, `object_subtype`, `object_id`, `object_name`, `action`, `fields`, `blog_id`, `channel`, `app` and `user_id`, so a rule can match on who made the change as well as what it touched. On a network the filter runs inside the site the change happened on, so a callback may read that site's own options to decide.
+
+Note that such an entry is not a mistake: WordPress refuses an identical meta write before the plugin ever sees it, so a change that reaches the log did alter the row. It is simply a change you may not care about, and only your site can say which those are.
+
 = What happens when I uninstall it? =
 
 The table is dropped and both of its options are deleted, on every site of a network. Nothing is left behind.
@@ -70,6 +85,9 @@ The table is dropped and both of its options are deleted, on every site of a net
 1. The log: what each change arrived on, which application password authenticated it, what it touched and which fields. The same entries are readable over the REST API.
 
 == Changelog ==
+
+= 1.1.0 =
+* A `digitizer_ai_agent_log_record` filter, applied to every entry once the channel and the application name are known, so a site can silence a writer it does not care about. Nothing is filtered by default.
 
 = 1.0.1 =
 * The plugin page gets its screenshot. No functional change.

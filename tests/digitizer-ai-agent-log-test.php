@@ -1760,4 +1760,120 @@ aial_test_eq(
 	'and deletes nothing but its own two options'
 );
 
+/* ---- silencing a writer the site does not care about ---- */
+
+// A plugin that rewrites its own settings whenever it loads produces a real
+// change - core refuses an identical meta write before the hook ever fires, so
+// anything that reaches the log did alter the row. It is still not a change
+// anybody asked about, and only the site can say which of its writers those
+// are. One filter, over the finished entry, at the moment it would be written.
+$writer = new AIAL_Test_Writer();
+Digitizer_AI_Agent_Log_Store::set_writer( $writer );
+$GLOBALS['aial_stub_options']           = array();
+$GLOBALS['aial_stub_multisite']         = false;
+$GLOBALS['aial_stub_rest_request']      = false;
+$GLOBALS['aial_stub_doing_cron']        = false;
+$GLOBALS['aial_stub_app_password_uuid'] = null;
+aial_stub_recording();
+$GLOBALS['aial_stub_filters'] = array();
+
+function aial_two_changes() {
+	Digitizer_AI_Agent_Log_Buffer::reset();
+	Digitizer_AI_Agent_Log_Hooks::on_option_updated( 'siteurl' );
+	Digitizer_AI_Agent_Log_Hooks::on_plugin_activated( 'akismet/akismet.php' );
+}
+
+$GLOBALS['aial_stub_doing_cron'] = true;
+$writer->inserted = array();
+aial_two_changes();
+Digitizer_AI_Agent_Log_Hooks::flush();
+aial_test_eq( count( $writer->inserted ), 2, 'with no filter attached both changes are written' );
+
+// The entry the filter is handed carries the channel and the application
+// name, which is one of the two reasons the gate runs at flush: neither is
+// knowable while the request is still running.
+$GLOBALS['aial_seen'] = array();
+add_filter(
+	'digitizer_ai_agent_log_record',
+	function ( $record, $entry ) {
+		$GLOBALS['aial_seen'][] = $entry;
+		return ( 'plugin' === $entry['object_type'] ) ? false : $record;
+	}
+);
+
+$writer->inserted = array();
+aial_two_changes();
+Digitizer_AI_Agent_Log_Hooks::flush();
+aial_test_eq( count( $writer->inserted ), 1, 'a filter returning false drops that entry' );
+aial_test_eq( $writer->inserted[0]['data']['object_type'], 'option', 'and leaves every other one alone' );
+aial_test_eq( count( $GLOBALS['aial_seen'] ), 2, 'the filter is offered every entry, not only the ones that survive' );
+aial_test_eq( $GLOBALS['aial_seen'][0]['channel'], 'cron', 'and each one carries the channel' );
+aial_test_ok( array_key_exists( 'app', $GLOBALS['aial_seen'][0] ), 'and the application password name' );
+aial_test_ok( array_key_exists( 'fields', $GLOBALS['aial_seen'][0] ), 'and the field names it touched' );
+
+// Anything falsy refuses; the value is not trusted to be a boolean. And a
+// request whose every row was filtered away has changed nothing on this site,
+// so it must not stamp the prune throttle - the same rule a poll that changed
+// nothing already follows.
+$GLOBALS['aial_stub_filters'] = array();
+add_filter( 'digitizer_ai_agent_log_record', function () { return 0; } );
+$writer->inserted = array();
+$writer->queries  = array();
+unset( $GLOBALS['aial_stub_options']['digitizer_ai_agent_log_last_prune'] );
+aial_two_changes();
+Digitizer_AI_Agent_Log_Hooks::flush();
+aial_test_eq( $writer->inserted, array(), 'a falsy non-boolean refuses too, and nothing is written' );
+aial_test_eq( $writer->queries, array(), 'and nothing is pruned' );
+aial_test_ok( ! isset( $GLOBALS['aial_stub_options']['digitizer_ai_agent_log_last_prune'] ), 'and the prune throttle is not stamped for a request that wrote nothing' );
+
+$GLOBALS['aial_stub_filters']    = array();
+$GLOBALS['aial_stub_doing_cron'] = false;
+Digitizer_AI_Agent_Log_Buffer::reset();
+
+// And it runs inside the site the entry belongs to. One CLI or cron request
+// can walk a whole network, and by the time flush() runs the originating site
+// is current again - so a callback that reads get_option() to decide what to
+// silence would apply the first site's policy to every other one. The filter
+// is asked after the switch, which is the only place that answer is right.
+$GLOBALS['wpdb']                    = $writer;
+$GLOBALS['aial_stub_multisite']     = true;
+$GLOBALS['aial_stub_doing_cron']    = true;
+$GLOBALS['aial_stub_current_blog']  = 1;
+$GLOBALS['aial_stub_switch_stack']  = array();
+$GLOBALS['aial_stub_switch_calls']  = 0;
+$GLOBALS['aial_stub_restore_calls'] = 0;
+$GLOBALS['aial_stub_blog_options']  = array(
+	1 => array( 'digitizer_ai_agent_log_schema' => Digitizer_AI_Agent_Log_Store::SCHEMA_VERSION ),
+	2 => array( 'digitizer_ai_agent_log_schema' => Digitizer_AI_Agent_Log_Store::SCHEMA_VERSION ),
+);
+aial_stub_enter_blog( 1 );
+
+Digitizer_AI_Agent_Log_Buffer::reset();
+Digitizer_AI_Agent_Log_Hooks::on_option_updated( 'siteurl' );
+switch_to_blog( 2 );
+Digitizer_AI_Agent_Log_Hooks::on_option_updated( 'blogname' );
+restore_current_blog();
+
+$GLOBALS['aial_context'] = array();
+$GLOBALS['aial_stub_filters'] = array();
+add_filter(
+	'digitizer_ai_agent_log_record',
+	function ( $record, $entry ) {
+		$GLOBALS['aial_context'][ (int) $entry['blog_id'] ] = (int) get_current_blog_id();
+		return $record;
+	}
+);
+
+$writer->inserted = array();
+Digitizer_AI_Agent_Log_Hooks::flush();
+
+aial_test_eq( $GLOBALS['aial_context'], array( 1 => 1, 2 => 2 ), 'each entry is offered to the filter inside its own site' );
+aial_test_eq( count( $writer->inserted ), 2, 'and both are written when the filter keeps them' );
+
+$GLOBALS['aial_stub_filters']    = array();
+$GLOBALS['aial_stub_multisite']  = false;
+$GLOBALS['aial_stub_doing_cron'] = false;
+aial_stub_enter_blog( 1 );
+Digitizer_AI_Agent_Log_Buffer::reset();
+
 aial_test_summary();
