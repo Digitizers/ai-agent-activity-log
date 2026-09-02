@@ -72,7 +72,7 @@ Yes, with a filter. Nothing is filtered out by default, because what is absent f
     return $record;
 }, 10, 2 );`
 
-The entry carries `object_type`, `object_subtype`, `object_id`, `object_name`, `action`, `fields`, `channel`, `app` and `user_id`, so a rule can match on who made the change as well as what it touched.
+The entry carries `object_type`, `object_subtype`, `object_id`, `object_name`, `action`, `fields`, `blog_id`, `channel`, `app` and `user_id`, so a rule can match on who made the change as well as what it touched. On a network the filter runs inside the site the change happened on, so a callback may read that site's own options to decide.
 
 Note that such an entry is not a mistake: WordPress refuses an identical meta write before the plugin ever sees it, so a change that reaches the log did alter the row. It is simply a change you may not care about, and only your site can say which those are.
 
